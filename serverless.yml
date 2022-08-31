@@ -1,0 +1,41 @@
+service: wom-api-lambda
+frameworkVersion: "3"
+configValidationMode: warn
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: sa-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:sa-east-1:179145757595:table/FormularioTable
+
+functions:
+  hello:
+    handler: src/hello.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  createForm:
+    handler: src/addForm.addForm
+    events:
+      - httpApi:
+          path: /forms
+          method: post
+resources:
+  Resources:
+    FormularioTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FormularioTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
